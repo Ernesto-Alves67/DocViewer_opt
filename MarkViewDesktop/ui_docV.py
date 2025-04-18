@@ -1,10 +1,11 @@
 import sys
 from os import path
-from PyQt5 import QtCore, QtGui, QtWidgets 
-from PyQt5.QtWidgets import QSplitter, QLabel, QSpinBox, QComboBox
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QFont, QTextCursor
-from PyQt5.QtSvg import QSvgRenderer
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtWidgets import QSplitter, QLabel, QSpinBox, QComboBox
+from PySide6.QtGui import QIcon, QPixmap, QPainter, QFont, QTextCursor
+from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtWebEngineWidgets import QWebEngineView
+
 
 def resource_path(relative_path):
     """ Get the absolute path to the resource, works for dev and for PyInstaller """
@@ -25,7 +26,9 @@ def loadSvgIcon(file_path, width=80, height=80):
     return pixmap
 
 class Ui_MainWindow(object):
-    iconspath = "_internal\\"+ "\\icons" + "\\"
+    # iconspath = "_internal\\"+ "\\icons_svg" + "\\"
+    iconspath = path.join(path.dirname(__file__), "icons_svg")
+    print(iconspath)
     style_button = """
     QToolTip,
     QPushButton {
@@ -64,7 +67,7 @@ class Ui_MainWindow(object):
     QPushButton:hover {
         background-color: #DCDCDC;  
     }
-"""
+    """
     style = f"""
         QTabWidget::pane {{
             background-image: url({iconspath+"docV_icon.png"});
@@ -77,7 +80,7 @@ class Ui_MainWindow(object):
         self.new_file_count = 0
         self.open_files = {}
         self.menu = None
-        self.has_op_menu = False
+        self.has_open_menu = False
         self.act_op_file = None
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(539, 307)
@@ -115,7 +118,7 @@ class Ui_MainWindow(object):
         self.headerLayout.setContentsMargins(0, 0, 0, 0)
         # ICON label
         self.icon_label = QtWidgets.QLabel(self.header_frame)
-        self.icon_label.setPixmap(QPixmap(resource_path('icons/docV_icon.png')).scaled(35, 35, aspectRatioMode=QtCore.Qt.KeepAspectRatio))
+        self.icon_label.setPixmap(QPixmap(resource_path('icons_svg/docV_icon.png')).scaled(35, 35, QtCore.Qt.KeepAspectRatio))
         self.icon_label.setMaximumHeight(30)
         self.icon_label.setMaximumWidth(45)
         self.icon_label.setContentsMargins(8,0,0,0)
@@ -125,12 +128,12 @@ class Ui_MainWindow(object):
         self.file_btn.setObjectName("file_btn")
         self.file_btn.setText("File")
         self.file_btn.setMaximumHeight(30)
-        self.file_btn.setMaximumWidth(45)
+        self.file_btn.setMaximumWidth(50)
 
         spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         # CLOSE WINDOW button
         self.close_btn = QtWidgets.QPushButton(self.header_frame)
-        self.close_btn.setIcon(QIcon(resource_path('icons/close.png')))
+        self.close_btn.setIcon(QIcon(self.iconspath+'/close.png'))
         self.close_btn.setObjectName("close_btn")
         self.close_btn.setStyleSheet(self.style_closeBTN)
         self.close_btn.setMaximumHeight(30)
@@ -138,7 +141,7 @@ class Ui_MainWindow(object):
         #self.close_btn.setToolTip("Close Window")
         # MINIMIZE WINDOW button
         self.minimize_btn = QtWidgets.QPushButton(self.header_frame)
-        self.minimize_btn.setIcon(QIcon(resource_path('icons/mini2.png')))
+        self.minimize_btn.setIcon(QIcon(self.iconspath+'/mini2.png'))
         self.minimize_btn.setObjectName("close_btn")
         self.minimize_btn.setStyleSheet(self.style_m_M)
         self.minimize_btn.setMaximumHeight(30)
@@ -146,7 +149,7 @@ class Ui_MainWindow(object):
         #self.minimize_btn.setToolTip("Minimize Window")
         # MAXIMIZE WINDOW button
         self.maxmize_btn = QtWidgets.QPushButton(self.header_frame)
-        self.maxmize_btn.setIcon(QIcon(resource_path('icons/maximizar.png')))
+        self.maxmize_btn.setIcon(QIcon(self.iconspath+'/maximizar.png'))
         self.maxmize_btn.setObjectName("maxmize_btn")
         self.maxmize_btn.setStyleSheet(self.style_m_M)
         self.maxmize_btn.setMaximumHeight(30)
@@ -197,14 +200,14 @@ class Ui_MainWindow(object):
         self.heading_btn.setStyleSheet(self.style_button)
         self.heading_btn.setMinimumHeight(25)
         self.editButtonsHL.addWidget(self.heading_btn)
-        self.heading_btn.setIcon(QIcon(loadSvgIcon(resource_path('icons/bx-heading.svg'))))
+        self.heading_btn.setIcon(QIcon(loadSvgIcon(self.iconspath+'/bx-heading.svg')))
         self.heading_btn.setToolTip("Header text")
         
         self.bold_btn = QtWidgets.QPushButton(self.buttons_frame)
         self.bold_btn.setObjectName("bold_btn")
         self.bold_btn.setMinimumHeight(25)
         self.bold_btn.setStyleSheet(self.style_button)
-        self.bold_btn.setIcon(QIcon(loadSvgIcon(resource_path('icons/bold.svg'))))
+        self.bold_btn.setIcon(QIcon(loadSvgIcon(self.iconspath+'/bold.svg')))
         self.bold_btn.setToolTip("Bold text")
         self.editButtonsHL.addWidget(self.bold_btn)
         
@@ -213,7 +216,7 @@ class Ui_MainWindow(object):
         self.italic_btn.setStyleSheet(self.style_button)
         self.italic_btn.setMinimumHeight(25)
         self.italic_btn.setMinimumWidth(15)
-        self.italic_btn.setIcon(QIcon(loadSvgIcon(resource_path('icons/bx-italic.svg'))))
+        self.italic_btn.setIcon(QIcon(loadSvgIcon(self.iconspath+'/bx-italic.svg')))
         self.italic_btn.setToolTip("Italic Text")
         self.editButtonsHL.addWidget(self.italic_btn)
         
@@ -221,7 +224,7 @@ class Ui_MainWindow(object):
         self.quote_btn.setObjectName("quote_btn")
         self.quote_btn.setStyleSheet(self.style_button)
         self.quote_btn.setMinimumHeight(25)
-        self.quote_btn.setIcon(QIcon(loadSvgIcon(resource_path('icons/bxs-quote-right.svg'))))
+        self.quote_btn.setIcon(QIcon(loadSvgIcon(self.iconspath+'/bxs-quote-right.svg')))
         self.quote_btn.setToolTip("Block Quote")
         self.editButtonsHL.addWidget(self.quote_btn)
         
@@ -229,7 +232,7 @@ class Ui_MainWindow(object):
         self.link_btn.setObjectName("link_btn")
         self.link_btn.setStyleSheet(self.style_button)
         self.link_btn.setMinimumHeight(25)
-        self.link_btn.setIcon(QIcon(loadSvgIcon(resource_path('icons/bx-link.svg'))))
+        self.link_btn.setIcon(QIcon(loadSvgIcon(self.iconspath+'/bx-link.svg')))
         self.link_btn.setToolTip("refer a link")
         self.editButtonsHL.addWidget(self.link_btn)
         
@@ -237,7 +240,7 @@ class Ui_MainWindow(object):
         self.unList_btn.setObjectName("unList_btn")
         self.unList_btn.setStyleSheet(self.style_button)
         self.unList_btn.setMinimumHeight(25)
-        icon = QtGui.QIcon(resource_path('icons/menu.png'))
+        icon = QtGui.QIcon(self.iconspath+'/menu.png')
         pixmap = icon.pixmap(QtCore.QSize(100, 100))
         pixmap = pixmap.scaled(128, 128, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation) # Redimensiona a imagem
         self.unList_btn.setIcon(QtGui.QIcon(pixmap))
@@ -248,7 +251,7 @@ class Ui_MainWindow(object):
         self.nList_btn.setObjectName("nList_btn")
         self.nList_btn.setStyleSheet(self.style_button)
         self.nList_btn.setMinimumHeight(25)
-        icon = QtGui.QIcon(resource_path('icons/number.png'))
+        icon = QtGui.QIcon(self.iconspath+'/number.png')
         pixmap = icon.pixmap(QtCore.QSize(100, 100))
         pixmap = pixmap.scaled(128, 128, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation) # Redimensiona a imagem
         self.nList_btn.setIcon(QtGui.QIcon(pixmap))
@@ -260,7 +263,7 @@ class Ui_MainWindow(object):
         self.taskList_btn.setObjectName("taskList_btn")
         self.taskList_btn.setStyleSheet(self.style_button)
         self.taskList_btn.setMinimumHeight(25)
-        icon = QtGui.QIcon(resource_path('icons/check_2.png'))
+        icon = QtGui.QIcon(self.iconspath+'/check_2.png')
         pixmap = icon.pixmap(QtCore.QSize(100, 100))
         pixmap = pixmap.scaled(128, 128, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.taskList_btn.setIcon(QtGui.QIcon(pixmap))
@@ -276,18 +279,18 @@ class Ui_MainWindow(object):
         self.tab_widget.setTabsClosable(True)
         self.splitter = QSplitter(QtCore.Qt.Vertical)
         self.editArea = QtWidgets.QTextEdit() #TextEditWithLineNumbers()
-        self.editArea.setStyleSheet("background-color: #DCDCDC;")
+        self.editArea.setStyleSheet("background-color: #DCDCDC; color: #000000;")
         self.editArea.setObjectName("editArea")
         font = QFont()
         font.setPointSize(16)
-        self.editArea.setFont(font)
         self.splitter.addWidget(self.tab_widget)
 
         #========================================= adding splitter to centralVL
         self.centralVL.addWidget(self.splitter)
         
         self.previewArea = QWebEngineView()
-        self.previewArea.setContextMenuPolicy(0) # Desabilita menu de contexto. 0=Qt.NoContextMenu
+        self.previewArea.setContextMenuPolicy(QtCore.Qt.NoContextMenu) # Desabilita menu de contexto. 0=Qt.NoContextMenu
+        #self.previewArea.loadFinished.connect(self.scroll_to_bottom)
         #========================================= adding previewArea to splitter
         self.splitter.addWidget(self.previewArea)
         
@@ -311,7 +314,6 @@ class Ui_MainWindow(object):
         self.nList_btn.clicked.connect(self.addNList)
         self.taskList_btn.clicked.connect(self.addTaskList)
 
-    
     def statusBarMessage(self):
         self.init_status_bar()
     def init_status_bar(self):
@@ -348,6 +350,18 @@ class Ui_MainWindow(object):
             }}
         """)
     
+    def scroll_to_bottom(self, ok):
+        """
+        Executa JavaScript para scrollar a página para o final.
+
+        Args:
+            ok (bool): True se o carregamento foi bem-sucedido, False caso contrário.
+        """
+        if ok:
+            javascript_code = "window.scrollTo(0, document.body.scrollHeight);"
+            self.previewArea.page().runJavaScript(javascript_code)
+        else:
+            print("Erro ao carregar a página.")
     #================Funções para os botoes de auxilio do Markdown
     def update_font_size(self):
         font = self.editArea.font()

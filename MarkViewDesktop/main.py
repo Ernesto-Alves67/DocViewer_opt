@@ -1,10 +1,11 @@
 import sys
 import os
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTextEdit,
-                             QMessageBox, QMenu, QFileDialog, QInputDialog,
-                             QVBoxLayout, QWidget, QAction)
+from PySide6 import QtCore, QtGui
+from PySide6.QtCore import Qt, QEvent
+from PySide6.QtGui import QAction, QIcon
+from PySide6.QtWidgets import (QApplication, QMainWindow, QTextEdit,
+                               QMessageBox, QMenu, QFileDialog, QInputDialog,
+                               QVBoxLayout, QWidget)
 import markdown # necessario para as tabelas
 from ui_docV import Ui_MainWindow
 
@@ -19,6 +20,8 @@ class MarkdownEditor(QMainWindow):
         self.ui.setupUi(self)
         self.initUI()
         self.setWindowFlags(Qt.FramelessWindowHint)
+        icone = QIcon("doc_icon.ico")  # Substitua pelo caminho do seu arquivo de ícone
+        self.setWindowIcon(icone)
         #self.setAttribute(Qt.WA_TranslucentBackground)
         #==================================================== Connect window funtcions to buttons
         self.ui.close_btn.clicked.connect(lambda: self.close())
@@ -49,11 +52,13 @@ class MarkdownEditor(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.setWindowTitle('DocViewer')
 
+      
         self.ui.file_btn.clicked.connect(self.show_menu)
         self.ui.tab_widget.tabCloseRequested.connect(self.close_tab)
         self.ui.tab_widget.currentChanged.connect(self.onTabChange)
         self.ui.tab_widget.tabBar().setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.tab_widget.tabBar().customContextMenuRequested.connect(self.onTabRightClick)
+        self.new_file()
     
     def create_menu(self):
         menu = QMenu()
@@ -80,15 +85,15 @@ class MarkdownEditor(QMainWindow):
         return menu
     
     def show_menu(self):
-        if not self.ui.has_op_menu:
-            self.ui.menu.exec_(self.ui.file_btn.mapToGlobal(self.ui.file_btn.rect().bottomLeft()))  # Exibir o menu abaixo do botão
-            self.ui.has_op_menu = True
+        if not self.ui.has_open_menu:
+            self.ui.menu.exec(self.ui.file_btn.mapToGlobal(self.ui.file_btn.rect().bottomLeft()))  # Exibir o menu abaixo do botão
+            self.ui.has_open_menu = True
         else:
             # Se o menu está aberto, fecha-o
             #print("Fechando o menu...")
             self.ui.menu.close()
             #self.menu = None
-            self.ui.has_op_menu = False    
+            self.ui.has_open_menu = False    
     #======================================== Gerencia uso dos atalhos
     def keyPressEvent(self, event):
         if event.type() == QEvent.KeyPress:
@@ -102,15 +107,24 @@ class MarkdownEditor(QMainWindow):
             #     self.renderPreview()
         super().keyPressEvent(event)
     #======================================== Mouse events para tratar redimensionamentos e Reposicionamentos
+    # def mousePressEvent(self, event):
+    #     # Armazena a posição do mouse quando pressionado
+    #     if event.button() == Qt.LeftButton:
+    #         self._mousePressPos = event.position()
+
+    # def mouseMoveEvent(self, event):
+    #     # Move a janela com base na posição do mouse
+    #     if self._mousePressPos is not None:
+    #         self.move(self.pos() + event.position() - self._mousePressPos)
     def mousePressEvent(self, event):
-        # Armazena a posição do mouse quando pressionado
+    # Armazena a posição do mouse quando pressionado
         if event.button() == Qt.LeftButton:
-            self._mousePressPos = event.pos()
+            self._mousePressPos = event.position().toPoint()
 
     def mouseMoveEvent(self, event):
         # Move a janela com base na posição do mouse
         if self._mousePressPos is not None:
-            self.move(self.pos() + event.pos() - self._mousePressPos)
+            self.move(self.geometry().topLeft() + event.position().toPoint() - self._mousePressPos)
 
     def mouseReleaseEvent(self, event):
         # Reseta a posição do mouse ao soltar
@@ -614,7 +628,7 @@ class MarkdownEditor(QMainWindow):
 
         # Criando uma área de texto
         text_edit = QTextEdit()  # TextEditWithLineNumbers()
-        text_edit.setStyleSheet("background-color: #DCDCDC;")
+        text_edit.setStyleSheet("background-color: #DCDCDC; color:black")
         text_edit.setTabStopDistance(32)
         layout.addWidget(text_edit)
         layout.setContentsMargins(4, 4, 4, 4)
@@ -638,17 +652,15 @@ class MarkdownEditor(QMainWindow):
         new_tab = QWidget()
         layout = QVBoxLayout()
 
-        # Criando uma área de texto
         text_edit = QTextEdit() #TextEditWithLineNumbers()
-        text_edit.setStyleSheet("background-color: #DCDCDC;")
+        text_edit.setStyleSheet("background-color: #DCDCDC; color:black")
         text_edit.setTabStopDistance(32)
         layout.addWidget(text_edit)
         layout.setContentsMargins(4, 4, 4, 4)
         new_tab.setLayout(layout)
         text_edit.textChanged.connect(lambda: self.updatePreview(text_edit))
-        # Gera um nome único para o novo arquivo
+
         new_file_name = self.generate_new_file_name()
-        # Adiciona uma nova aba com o editor de texto
         tab_index = self.ui.tab_widget.addTab(new_tab, new_file_name)
         self.ui.tab_widget.setCurrentIndex(tab_index)
         text_edit.setFocus()
@@ -678,4 +690,4 @@ if __name__ == '__main__':
     #    styleSheetFile.close()
     window = MarkdownEditor()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
